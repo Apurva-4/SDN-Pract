@@ -1,0 +1,125 @@
+2960-24TT switch (3)
+
+connected via copper straight through
+
+s1-s2(g0/1 -g0/1 and g0/2-g0/2)
+s1-s3(f0/21-f0/21 and f0/22-f0/22)
+s2-s3(f0/23-f0/23 and f0/24-f0/24)
+
+              s1
+
+
+
+s2                        s3
+
+
+Pract 7 eatherchannel
+s1 cli
+-en
+-conf t
+-hostname s1
+-int range g0/1-2,f0/21-22
+-switchport mode trunk
+-switchport nonegotiate
+
+s2 cli
+-en
+-conf t
+-hostname s2
+-int range g0/1-2,f0/23-24
+-switchport mode trunk
+-switchport nonegotiate
+
+s3 cli
+-en
+-conf t
+-hostname s3
+-int range f0/21-24
+-switchport mode trunk
+-switchport nonegotiate
+
+s1 cli-show interfaces trunk 
+
+Part 2
+s1 cli
+converting nonegotiate to PAgP
+-en
+-conf t
+-interface range f0/21-22
+-shutdown
+-channel-group 1 mode desirable
+-no shutdown
+
+s3 cli
+-en
+-conf t
+-interface range f0/21-22
+-shutdown
+-channel-group 1 mode desirable
+-no shutdown
+
+s1 cli
+-interface port-channel 1
+-switchport mode trunk
+-exit
+
+s3 cli
+-interface port-channel 1
+-switchport mode trunk
+-exit
+
+check pagp connection
+-show etherchannel summary
+
+
+part 3
+converting no negotiate to LACP
+s1 cli
+-en
+-conf t
+-interface range g0/1-2
+-shutdown
+-channel-group 2 mode active
+-no shutdown
+-exit
+-interface port-channel 2
+-switchport mode trunk
+-exit
+
+s2 cli
+-en
+-conf t
+-interface range g0/1-2
+-shutdown
+-channel-group 2 mode active
+-no shutdown
+-exit
+-interface port-channel 2
+-switchport mode trunk
+-exit
+
+Part 4
+converting no negotiate to negotiate LACP
+s2 cli
+-en
+-conf t
+-interface range f0/23-24
+-shutdown
+-channel-group 3 mode active
+-no shutdown
+-exit
+-interface port-channel 3
+-switchport mode trunk
+-exit
+
+s3 cli
+-en
+-conf t
+-interface range f0/23-24
+-shutdown
+-channel-group 3 mode active
+-no shutdown
+-exit
+-interface port-channel 3
+-switchport mode trunk
+-exit

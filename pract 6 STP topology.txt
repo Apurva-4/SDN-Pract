@@ -1,0 +1,114 @@
+Pract 6 
+3650-24PS Multilayer switch (2)
+2960-24TT switch (1)
+connecion via - copper straight through
+
+D1-D2(g1/0/1-g1/0/1)
+D1-A1(g1/0/5-f0/1 and g1/0/6-f0/2)
+D2-A1(g1/0/5-f0/3 and g1/0/6-f0/4)
+
+
+D1 cli
+Switch>en
+Switch#conf t
+
+Switch(config)#hostname D1
+
+D1(config)#spanning-tree mode pvst
+D1(config)#banner motd #D1, STP Topology change and RSTP lab #
+
+D1(config)#line con 0
+D1(config-line)#exec-timeout 0 0
+D1(config-line)#logging synchronous
+D1(config-line)#exit
+D1(config)#interface range g1/0/1-24
+D1(config-if-range)#shutdown
+D1(config-if-range)#int range g1/0/1,g1/0/5-6
+D1(config-if-range)#switchport mode trunk
+
+D1(config-if-range)#no shutdown
+
+D1(config-if-range)#exit	
+D1(config)#vlan 2
+D1(config-vlan)#name secondVLAN
+D1(config-vlan)#exit
+D1(config)#int vlan 1
+D1(config-if)#ip address 10.0.0.1 255.0.0.0
+D1(config-if)#no shutdown
+
+
+D1(config-if)#exit
+
+
+D2 cli
+Switch>en
+Switch#conf t
+
+Switch(config)#hostname D2
+
+D2(config)#spanning-tree mode pvst
+D2(config)#banner motd #D2, STP Topology change and RSTP lab #
+
+D2(config)#line con 0
+D2(config-line)#exec-timeout 0 0
+D2(config-line)#logging synchronous
+D2(config-line)#exit
+D2(config)#interface range g1/0/1-24
+D2(config-if-range)#shutdown
+D2(config-if-range)#int range g1/0/1,g1/0/5-6
+D2(config-if-range)#switchport mode trunk
+
+D2(config-if-range)#no shutdown
+
+D2(config-if-range)#exit	
+D2(config)#vlan 2
+D2(config-vlan)#name secondVLAN
+D2(config-vlan)#exit
+D2(config)#int vlan 1
+D2(config-if)#ip address 10.0.0.2 255.0.0.2
+D2(config-if)#no shutdown
+
+
+D1(config-if)#exit
+
+A1 cli
+
+Switch>en
+Switch#conf t
+
+Switch(config)#hostname A1
+
+A1(config)#spanning-tree mode pvst
+A1(config)#banner motd #A1, STP Topology change and RSTP lab #
+
+A1(config)#line con 0
+A1(config-line)#exec-timeout 0 0
+A1(config-line)#logging synchronous
+A1(config-line)#exit
+A1(config)#interface range f0/1-24,g0/1-2
+A1(config-if-range)#shutdown
+A1(config-if-range)#int range f0/1-4
+A1(config-if-range)#switchport mode trunk
+
+A1(config-if-range)#no shutdown
+
+A1(config-if-range)#exit	
+A1(config)#vlan 2
+A1(config-vlan)#name secondVLAN
+A1(config-vlan)#exit
+A1(config)#int vlan 1
+A1(config-if)#ip address 10.0.0.3 255.0.0.0
+A1(config-if)#no shutdown
+
+
+D1(config-if)#exit
+
+end
+show ip int br
+show spanning-tree active
+
+
+
+
+
+

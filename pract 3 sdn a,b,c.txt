@@ -1,0 +1,203 @@
+3(A)
+SPAN technology
+
+PC(2)
+switch(1)
+
+connected via copper straight through
+
+pc1-switch(f0/0-f0/1)
+switch-PC2(f0/2-f0/0)
+
+configure switch cli
+
+
+Switch>en
+Switch#conf t
+
+Switch(config)#monitor session 1 source int f0/1 
+Switch(config)#monitor session 1 destination int f0/2 
+Switch(config)#end
+
+
+Switch#show monitor session 1
+Session 1
+---------
+Type                   : Local Session
+Description            : -
+Source Ports           : 
+    Both               : Fa0/1
+Destination Ports      : Fa0/2
+    Encapsulation      : Native
+          Ingress      : Disabled
+
+
+
+3(B)
+SNMP
+
+
+pc(1)
+switch(1)
+1841 router(2)
+
+connected via copper straight through
+
+pc-switch(f0/0-f0/1)
+switch-R1(f0/2-f0/0)
+switch-R2(f0/3-f0/0)
+
+configure pc ip
+IP=172.168.1.2
+Default gateway=172.168.1.1
+ 
+
+configure R1
+fastethernet0/0=172.168.1.1
+on
+
+configure R2
+fastethernet0/0=172.168.2.1
+on
+
+
+R1 cli
+Router>enable
+
+Router#configure terminal
+
+Router(config)#interface FastEthernet0/0
+Router(config-if)#ip address 172.168.1.1 255.255.0.0
+Router(config-if)#ip address 172.168.1.1 255.255.0.0
+Router(config-if)#no shutdown changed state to up
+
+Router(config-if)#snmp-server community read ro 
+
+Router(config)#snmp-server community write rw
+Router(config)#
+
+
+click on PC
+|
+Desktop
+|
+MIB browser
+|
+address=172.168.1.1
+|
+advanced
+|
+read community=read
+write community=write
+ok
+|
+MIB tree 
+expand the three till sysName
+|
+Get
+|
+Go
+
+if you get the names then you have successfully completed the pract
+
+
+***Syslog***
+server(1)
+router(1)
+switch(1)
+pc(1)
+
+connected via copper cross over
+
+server-router(fa0- fa0/0)
+router-switch(fa0/1-fa0/1)
+switch-pc(fa0/2-fa0)
+
+
+pc
+ip conf
+30.0.0.2/30.0.0.1
+
+router
+f0/0=10.0.0.1
+on
+
+f0/1=30.0.0.1
+on
+
+server
+ip conf
+10.0.0.2/10.0.0.1
+
+
+r1 cli
+
+Router(config-if)#exit
+Router(config)#service timestamps log datetime msec
+Router(config)#int f0/0.1
+	
+Router(config-subif)#int f0/1.1
+
+
+
+3(c)
+flexible netflow
+for flexible netflow use syslog setup
+ run following code in router cli
+
+Router>en
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#int f0/0
+Router(config-if)#ip flow ingress
+Router(config-if)#ip flow egress
+Router(config-if)#ip flow-export destination 10.0.0.2 55
+Router(config)#ip flow-export source f0/0
+Router(config)#end
+Router#
+*Mar 01, 00:32:20.3232: SYS-5-CONFIG_I: Configured from console by console
+Router#show ip cache flow
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,221 @@
+pract 5 
+inter VLAN routing
+
+1841 router(1)
+switch (2)
+pc(2)
+connected via copper straight through
+
+r1-s1(fa0/0-fa0/1)
+s1-s2(fa0/2-fa0/1)
+s1-pca(fa0/3-fa0)
+s2-pcb(fa0/2-fa0) 
+
+pca conf
+ip
+192.168.20.3/192.168.20.1
+
+pcb conf
+ip 
+192.168.30.3/192.168.30.1
+
+s1 cli
+s1>en
+s1#conf
+
+s1(config)#hostname s1
+s1(config)#vlan 10
+s1(config-vlan)#name management
+s1(config-vlan)#exit
+s1(config)#vlan 20
+s1(config-vlan)#name sales
+s1(config-vlan)#exit
+s1(config)#vlan 30
+s1(config-vlan)#name operations
+s1(config-vlan)#exit
+s1(config)#vlan 999
+s1(config-vlan)#name parking_lot
+s1(config-vlan)#exit
+
+s1(config)#vlan 1000
+s1(config-vlan)#name Native
+s1(config-vlan)#exit
+s1(config)#end
+
+s1#show vlan br
+s1#conf t
+s1(config)#int vlan 10
+s1(config-if)#ip address 192.168.10.11 255.255.255.0
+s1(config-if)#exit
+s1(config)#ip default-gateway 192.168.10.1
+
+s1(config)#int vlan 10
+s1(config-if)#no shutdown
+s1(config-if)#exit
+s1(config)#end
+
+s1#
+s1#conf t
+s1(config)#int range f0/4-24,g0/1-2
+s1(config-if-range)#switchport mode access
+s1(config-if-range)#switchport access vlan 999
+s1(config-if-range)#shutdown
+s1#show vlan
+
+
+s2 cli
+Switch>
+Switch>en
+Switch#
+Switch#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#vlan 10
+Switch(config-vlan)#name management
+Switch(config-vlan)#exit
+Switch(config)#vlan 20
+Switch(config-vlan)#name sales
+Switch(config-vlan)#exit
+Switch(config)#vlan 30
+Switch(config-vlan)#name operations
+Switch(config-vlan)#exit
+Switch(config)#vlan 999
+Switch(config-vlan)#name parking_lot
+Switch(config-vlan)#exit
+Switch(config)#vlan 1000
+Switch(config-vlan)#name Native
+Switch(config-vlan)#exit
+Switch(config)#end
+Switch#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Switch#show vlan br	
+Switch#conf t
+
+Switch(config)#int vlan 10
+Switch(config-if)#
+Switch(config-if)#ip address 192.168.10.12 255.255.255.0
+Switch(config-if)#exit
+Switch(config)#ip default-gateway 192.168.10.1
+Switch(config)#int vlan 10
+Switch(config-if)#no shutdown
+Switch(config-if)#exit
+Switch(config)#int range f0/3-24,g0/1-2	
+Switch(config-if-range)#switchport mode access 
+Switch(config-if-range)#switchport access vlan 999
+Switch(config-if-range)#shutdown
+Switch(config-if-range)#end
+Switch#
+%SYS-5-CONFIG_I: Configured from console by console
+Switch#show vlan br
+
+
+s1 cli
+s1>en
+s1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+s1(config)#int f0/3
+s1(config-if)#switchport mode access
+s1(config-if)#switchport access vlan 20
+s1(config-if)#exit
+s1(config)#end
+s1#
+%SYS-5-CONFIG_I: Configured from console by console
+
+s1#show vlan br
+
+
+
+s2 cli
+Switch>en
+Switch#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Switch(config)#int f0/2
+Switch(config-if)#switchport mode access
+Switch(config-if)#switchport access vlan 30
+Switch(config-if)#exit
+Switch(config)#end
+Switch#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Switch#show vlan br
+
+
+s1 cli
+s1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+s1(config)#int f0/2
+s1(config-if)#switchport mode access 
+s1(config-if)#switchport mode trunk
+ 	
+s1(config-if)#switchport trunk Native vlan 1000 
+ 
+
+s1(config-if)#switchport trunk allowed vlan 1000
+s1(config-if)#
+
+s1(config-if)#switchport trunk allowed vlan 10,20,30,1000
+
+s2 cli
+s2#conf t
+
+s2(config)#int f0/1
+s2(config-if)#switchport mode trunk
+
+s2(config-if)#switchport trunk native vlan 1000
+
+
+s2(config-if)#switchport trunk allowed vlan 10,20,30,1000
+s2(config-if)#exit
+s2(config)#end
+
+s2#show vlan br 
+s2#show int trunk 
+
+
+R1 cli
+Router>en
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#int f0/0.10
+Router(config-subif)#description vlan 10
+Router(config-subif)#encapsulation  dot1Q 10
+Router(config-subif)#ip address 192.168.10.1 255.255.255.0
+Router(config-subif)#exit
+Router(config)#
+
+Router#conf t
+Router(config)#int f0/0.20
+Router(config-subif)#description vlan 20
+Router(config-subif)#encapsulation  dot1Q 10
+
+
+Router(config-subif)#ip address 192.168.20.1 255.255.255.0
+
+Router(config-subif)#exit
+Router(config)#int f0/0.30
+Router(config-subif)#description vlan 30
+Router(config-subif)#encapsulation dot1Q 30
+Router(config-subif)#ip address 192.168.30.1 255.255.255.0
+Router(config-subif)#exit
+
+Router(config)#int f0/0.1000
+Router(config-subif)#description vlan 1000
+Router(config-subif)#encapsulation dot1Q 1000
+Router(config-subif)#description Native
+Router(config-subif)#encapsulation dot1Q 1000 native
+Router(config-subif)#exit
+Router(config)#int f0/0
+Router(config-if)#no shutdown
+
+
+Router(config-if)#exit
+Router(config)#end
+Router#
+%SYS-5-CONFIG_I: Configured from console by console
+
+Router#show ip int br
+
+
+
+
+

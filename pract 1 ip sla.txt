@@ -1,0 +1,113 @@
+c7200 router(2)
+click on router -> slot->4A-4t+ ->ok
+similarly do it for R2
+
+connect router via serial cable
+R1-R2(s1/0-s1/0)
+
+click on green arrow button start all nodes
+
+get console (>_) click on it 
+
+
+Part1
+R1#
+R1#conf t
+
+R1(config)#int s1/0
+R1(config-if)#ip address 209.165.200.9 255.255.255.252
+R1(config-if)#no shutdown
+
+R1(config-if)#ip route 0.0.0.0 0
+
+
+R1(config-if)#ip route 0.0.0.0 0.0.0.0 209.165.200.10
+R1(config)#exit
+R1#conf t
+
+R1(config)#hostname R1
+
+part 2
+R2#
+R2#conf t
+
+R2(config)#hostname ISP
+ISP(config)#int s1/0
+ISP(config-if)#ip address 209.165.200.10 255.255.255.252
+ISP(config-if)#clock rate 4032000
+ISP(config-if)#exit
+ISP(config)#no ip domain-lookup
+ISP(config)#int loopback 0
+
+ISP(config-if)#ip address 198.133.219.1 255.255.255.255
+ISP(config-if)#no shutdown
+ISP(config-if)#exit
+ISP(config)#int s1/0
+ISP(config-if)#no shutdown
+
+ISP(config-if)#exit
+
+ISP(config-if)#end
+
+ISP#ping 198.133.219.1
+
+Success rate is 100 percent (5/5), round-trip min/avg/max = 8/8/8 ms
+ISP#
+
+part 3
+R1(config)#end
+
+R1#ping 209.165.200.10
+
+Success rate is 100 percent (5/5), round-trip min/avg/max = 24/32/44 ms
+R1#ping 198.133.219.1
+
+Success rate is 100 percent (5/5), round-trip min/avg/max = 20/28/32 ms
+R1#
+
+part 4
+R1#conf t
+
+R1(config)#ip sla 22
+R1(config-ip-sla)#icmp-echo 198.133.219.1
+
+R1(config-ip-sla-echo)#frequency 20
+R1(config-ip-sla-echo)#ip sla schedule 22 start-time now life forever
+R1(config)#end
+
+R1#show ip sla configuration
+
+
+part 5
+ISP#conf t
+ 
+
+ISP(config)#int loopback 0
+ISP(config-if)#shutdown
+ISP(config-if)#
+
+ISP(config-if)#no shutdown
+ISP(config-if)#
+
+ISP(config-if)#
+
+
+
+
+part 6
+
+R1#show ip sla statistics
+*****output should be like this**********
+IPSLAs Latest Operation Statistics
+
+IPSLA operation id: 22
+        Latest RTT: 24 milliseconds
+Latest operation start time: 21:04:06 UTC Thu Jan 19 2023
+Latest operation return code: OK
+Number of successes: 15
+Number of failures: 2
+Operation time to live: Forever
+
+
+
+
